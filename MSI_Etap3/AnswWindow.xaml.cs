@@ -39,7 +39,7 @@ namespace MSI_Etap3
             if (faces.Count >= 1)
             {
                 int peopleCounter = 0;
-                peopleCounter = faces[faces.Count - 1].NetworkIndex + 1;
+                peopleCounter = faces[faces.Count - 1].ClassIndex + 1;
                 peopleNumber = peopleCounter;
                 Console.WriteLine("wczytano z binarki " + faces.Count + " danych");
             }

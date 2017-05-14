@@ -21,7 +21,7 @@ namespace MSI_Etap3.Helper
     /// </summary>
     public class InputHelper
     {
-        public static Face FacePreparation(String picDir, String _name, String _folderName, int _index, Face twarz, int _folderIndex)
+        public static Face FacePreparation(String picDir, String _name, String _folderName, int _index, Face twarz)
         {
             int Image = 0;
             if (FSDK.LoadImageFromFile(ref Image, picDir) != FSDK.FSDKE_OK)
@@ -43,7 +43,6 @@ namespace MSI_Etap3.Helper
                 twarz.FolderName = _folderName;
                 Console.WriteLine(twarz.Name);
                 twarz.ClassIndex = _index;
-                twarz.NetworkIndex = _folderIndex;
                 List<float> faceFeatures = FeatureConverter.GetFeatures(FacialFeatures);
                 twarz.Features = faceFeatures;
 

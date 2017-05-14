@@ -11,7 +11,7 @@ namespace MSI_Etap3.Content
     public class InputClass
     {
         public int hiddenLayers { get; set; }
-        public int hiddenNeurons { get; set; }
+        public int[] hiddenNeurons { get; set; }
         public IActivationFunction activationFunction { get; set; }
         public bool bias { get; set; }
         public int iterations { get; set; }
@@ -19,19 +19,42 @@ namespace MSI_Etap3.Content
         public double momentum { get; set; }
         public string learningError { get; set; }
         public string testingError { get; set; }
-        public string peopleNumber { get; set; }
         public string timeElapsed { get; set; }
 
         public InputClass()
         {
 
         }
+        public static int[] ParseLayerNeurons(string txt, int layers)
+        {
+            int[] neuronPerLayer = new int[layers];
+            string[] strings = txt.Split(',');
+            if (strings.Length != neuronPerLayer.Length)
+            {
+                return new int[0];
+            }
+            else
+            {
+                for (int i = 0; i < strings.Length; i++)
+                {
+                    if (!int.TryParse(strings[i], out neuronPerLayer[i]))
+                    {
+                        return new int[0];
+                    }
+                    else if (neuronPerLayer[i] < 1)
+                    {
+                        return new int[0];
+                    }
+                }
+            }
+            return neuronPerLayer;
+        }
         public bool ValidateInput(string TBLayers, string TBNeuronsInLayer, IActivationFunction _activationFunction,
-            string TBIteracje, string TBWspUczenia, string TBWspBezwladnosci, int _peopleNumber)
+            string TBIteracje, string TBWspUczenia, string TBWspBezwladnosci)
         {
             bool isCorrect = true;
             int _hiddenLayers = 0;
-            int _hiddenNeurons = 0;
+            int[] _hiddenNeurons;
             int _iterations = 0;
             double _learningFactor = 0.0;
             double _momentum = 0.0;
@@ -42,8 +65,8 @@ namespace MSI_Etap3.Content
                 MessageBox.Show("Error ! Network need at least one hidden layer.");
                 return false;
             }
-            int1 = int.TryParse(TBNeuronsInLayer, out _hiddenNeurons);
-            if (int1 == false || _hiddenNeurons < 1)
+            _hiddenNeurons = ParseLayerNeurons(TBNeuronsInLayer, _hiddenLayers);
+            if (_hiddenNeurons.Length < 1)
             {
                 MessageBox.Show("Error ! Network need at least one neuron in hidden layer.");
                 return false;
@@ -72,9 +95,26 @@ namespace MSI_Etap3.Content
             bias = true;
             iterations = _iterations;
             learningFactor = _learningFactor;
-            momentum = _momentum;      
-            peopleNumber = _peopleNumber.ToString();
+            momentum = _momentum;
             return isCorrect;
+        }
+        public string ToString()
+        {
+            string descripction = "";
+            descripction += "Hidden Layers : " + hiddenLayers + Environment.NewLine;
+            descripction += "Hidden Neurons : ";
+            for (int i = 0; i < hiddenNeurons.Length; i++)
+            {
+                descripction += hiddenNeurons[i];
+                if (i < hiddenNeurons.Length - 1)
+                    descripction += ",";
+            }
+            descripction += Environment.NewLine;
+            descripction += "Iterations : " + iterations + Environment.NewLine;
+            descripction += "Learning Factor : " + learningFactor + Environment.NewLine;
+            descripction += "Momentum : " + momentum + Environment.NewLine;
+
+            return descripction;
         }
     }
 }

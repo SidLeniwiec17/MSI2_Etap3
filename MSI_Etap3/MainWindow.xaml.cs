@@ -67,7 +67,7 @@ namespace MSI_Etap3
                     folderName = folderNames[folderNames.Count() - 2];
                     for (int j = 0; j < pictures.Count; j++)
                     {
-                        addSingleFace(pictures[j], pictures[j].Substring(pictures[j].LastIndexOf('\\') + 1), folderName, j, folderIndex, false);
+                        addSingleFace(pictures[j], pictures[j].Substring(pictures[j].LastIndexOf('\\') + 1), folderName, folderIndex, false);
                     }
                 }
                 peopleNumber = imageList.Count;
@@ -80,10 +80,10 @@ namespace MSI_Etap3
         /// Metoda dodaje jedna twarz do listy. 1 jak sie uda
         /// -1 jak sie nie uda
         /// </summary>
-        private int addSingleFace(String picDir, String name, String folderName, int index, int folderIndex, bool testing)
+        private int addSingleFace(String picDir, String name, String folderName, int folderIndex, bool testing)
         {
             Face twarz = new Face();
-            twarz = InputHelper.FacePreparation(picDir, name, folderName, index, twarz, folderIndex);
+            twarz = InputHelper.FacePreparation(picDir, name, folderName, folderIndex, twarz);
 
             if (testing)
                 testingFaces.Add(twarz);
@@ -108,7 +108,7 @@ namespace MSI_Etap3
             if (learningFaces.Count >= 1)
             {
                 int peopleCounter = 0;
-                peopleCounter = learningFaces[learningFaces.Count - 1].NetworkIndex + 1;
+                peopleCounter = learningFaces[learningFaces.Count - 1].ClassIndex + 1;
                 peopleNumber = peopleCounter;
                 Console.WriteLine("wczytano z binarki " + learningFaces.Count + " danych");
             }
@@ -125,7 +125,7 @@ namespace MSI_Etap3
                 return;
             }
             if (inputData.ValidateInput(TBLayers.Text, TBNeuronsInLayer.Text, ActivationFunction,
-                TBIteracje.Text, TBWspUczenia.Text, TBWspBezwladnosci.Text, peopleNumber) == false)
+                TBIteracje.Text, TBWspUczenia.Text, TBWspBezwladnosci.Text) == false)
             {
                 BlakWait.Visibility = Visibility.Collapsed;
                 return;
@@ -134,12 +134,10 @@ namespace MSI_Etap3
             {
                 LEnumber.Content = "---";
                 TEnumber.Content = "---";
-                Pnumber.Content = "---";
                 Tnumber.Content = "---";
                 await PerformCalculation();
                 LEnumber.Content = inputData.learningError.ToString();
                 TEnumber.Content = inputData.testingError.ToString();
-                Pnumber.Content = inputData.peopleNumber.ToString();
                 Tnumber.Content = inputData.timeElapsed.ToString();
             }
             BlakWait.Visibility = Visibility.Collapsed;
@@ -156,9 +154,8 @@ namespace MSI_Etap3
                 double[][] neuralTestingOutput = NetworkHelper.CreateLearningOutputDataSet(testingFaces, 4);
                 INeuralDataSet learningSet, testingSet;
 
-                learningSet = NetworkHelper.NormaliseDataSet(neuralLearningInput, neuralLearningOutput, 1);
-                testingSet = NetworkHelper.NormaliseDataSet(neuralTestingInput, neuralTestingOutput, 1);
-                
+                learningSet = NetworkHelper.NormaliseDataSet(neuralLearningInput, neuralLearningOutput);
+                testingSet = NetworkHelper.NormaliseDataSet(neuralTestingInput, neuralTestingOutput);
 
                 ITrain network = NetworkHelper.LearnNetwork(learningSet, testingSet, learningFaces[0].Features.Count, inputData, testingFaces.Count);
                 learnedNetwork = network;
@@ -184,7 +181,7 @@ namespace MSI_Etap3
                     folderName = folderNames[folderNames.Count() - 2];
                     for (int j = 0; j < pictures.Count; j++)
                     {
-                        addSingleFace(pictures[j], pictures[j].Substring(pictures[j].LastIndexOf('\\') + 1), folderName, j, folderIndex, true);
+                        addSingleFace(pictures[j], pictures[j].Substring(pictures[j].LastIndexOf('\\') + 1), folderName, folderIndex, true);
                     }
                 }
                 peopleNumber = imageList.Count;
@@ -207,7 +204,7 @@ namespace MSI_Etap3
             if (learningFaces.Count >= 1)
             {
                 int peopleCounter = 0;
-                peopleCounter = testingFaces[testingFaces.Count - 1].NetworkIndex + 1;
+                peopleCounter = testingFaces[testingFaces.Count - 1].ClassIndex + 1;
                 peopleNumber = peopleCounter;
                 Console.WriteLine("wczytano z binarki " + testingFaces.Count + " danych");
             }

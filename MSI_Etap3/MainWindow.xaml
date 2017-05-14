@@ -27,8 +27,8 @@
                     <Label Grid.Column="0" Grid.Row="3" Content="Learning Factor :" HorizontalAlignment="Right" Margin="2,2,2,2" VerticalAlignment="Center"/>
                     <Label Grid.Column="0" Grid.Row="4" Content="Momentum :" HorizontalAlignment="Right" Margin="2,2,2,2" VerticalAlignment="Center"/>
 
-                    <TextBox Name="TBLayers" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" Margin="2,2,2,2" TextWrapping="Wrap" Text="1" VerticalAlignment="Center"/>
-                    <TextBox Name="TBNeuronsInLayer" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="2,2,2,2" TextWrapping="Wrap" Text="12" VerticalAlignment="Center" />
+                    <TextBox Name="TBLayers" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" Margin="2,2,2,2" TextWrapping="Wrap" Text="2" VerticalAlignment="Center"/>
+                    <TextBox Name="TBNeuronsInLayer" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Margin="2,2,2,2" TextWrapping="Wrap" Text="24,8" VerticalAlignment="Center" />
                     <TextBox Name="TBIteracje" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="2,2,2,2" TextWrapping="Wrap" Text="35000" VerticalAlignment="Center"/>
                     <TextBox Name="TBWspUczenia" Grid.Column="1" HorizontalAlignment="Left" Margin="2,2,2,2" TextWrapping="Wrap" Text="0,01" VerticalAlignment="Center"  Grid.Row="3"/>
                     <TextBox Name="TBWspBezwladnosci" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Left" Margin="2,2,2,2" TextWrapping="Wrap" Text="0,4" VerticalAlignment="Center"/>
@@ -89,8 +89,6 @@
                         <Label Name="LEnumber" Grid.Column="1" Grid.Row="0" Content="---" HorizontalAlignment="Left" Margin="1,1,1,1" VerticalAlignment="Center"/>
                         <Label Grid.Column="0" Grid.Row="1" Content="Testing Error :" HorizontalAlignment="Right" Margin="1,1,1,1" VerticalAlignment="Center"/>
                         <Label Name="TEnumber" Grid.Column="1" Grid.Row="1" Content="---" HorizontalAlignment="Left" Margin="1,1,1,1" VerticalAlignment="Center"/>
-                        <Label Grid.Column="2" Grid.Row="0" Content="People Number :" HorizontalAlignment="Right" Margin="1,1,1,1" VerticalAlignment="Center"/>
-                        <Label Name="Pnumber" Grid.Column="3" Grid.Row="0" Content="---" HorizontalAlignment="Left" Margin="1,1,1,1" VerticalAlignment="Center"/>
                         <Label Name="Tnumber" Grid.Column="3" Grid.Row="1" Content="---" HorizontalAlignment="Left" Margin="1,1,1,1" VerticalAlignment="Center"/>
                         <Label Grid.Column="2" Grid.Row="1" Content="Time Elapsed :" HorizontalAlignment="Right" Margin="1,1,1,1" VerticalAlignment="Center"/>
                     </Grid>

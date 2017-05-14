@@ -11,18 +11,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace MSI_Etap3.Helper
 {
     public class NetworkHelper
     {
-        public static double maxOutput = 0.0;
-        public static double minOutput = 0.0;
-
 
         public static INeuralDataSet CombineTrainingSet(double[][] dane, double[][] odpowiedzi)
         {
@@ -33,7 +32,7 @@ namespace MSI_Etap3.Helper
         {
             double[][] neuralInput = new double[faces.Count][];
             int counter = 0;
-            for (int i = 0; i < faces.Count(); i ++)
+            for (int i = 0; i < faces.Count(); i++)
             {
                 neuralInput[counter] = new double[faces[i].Features.Count];
                 for (int j = 0; j < faces[i].Features.Count; j++)
@@ -55,19 +54,31 @@ namespace MSI_Etap3.Helper
                 neuralOutput[counter] = new double[classes];
                 for (int j = 0; j < classes; j++)
                 {
-                    if (j == faces[i].NetworkIndex)
+                    if (j == faces[i].ClassIndex)
                         neuralOutput[counter][j] = 1.0;
                     else
                         neuralOutput[counter][j] = 0.0;
                 }
+                counter++;
             }
-            counter++;
 
             return neuralOutput;
         }
-
+        public static String GetTimestamp(DateTime value)
+        {
+            return value.ToString("yyyyMMddHHmmssffff");
+        }
+        public static void Logger(String lines, string dir, String timeStamp)
+        {
+            string fullPath = dir + "\\LOGS\\log_" + timeStamp + ".txt";
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+            System.IO.StreamWriter file = new System.IO.StreamWriter(fullPath, true);
+            file.WriteLine(lines);
+            file.Close();
+        }
         public static ITrain LearnNetwork(INeuralDataSet learningSet, INeuralDataSet testingSet, int inputSize, InputClass inputData, int testingSize)
         {
+            string logDir = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
             int iteracje = inputData.iterations;
             List<double> errors = new List<double>();
             Console.WriteLine("Tworze siec...");
@@ -85,19 +96,19 @@ namespace MSI_Etap3.Helper
             } while ((iteracja < iteracje) && (Network.Error > 0.0001) && (Network.Error < 10000));
             stopwatch.Stop();
 
+            String timeStamp = GetTimestamp(DateTime.Now);
             /// TUTAJ SIEC SIE TEORETYCZNIE NAUCZYLA
             /// TERAZ ZBIOR TESTOWY, WYNIKI
             /// I WYKRES ERRORA
             /// 
-
-
+            Logger(inputData.ToString(), logDir, timeStamp);
 
             double[] neuralAnswer = new double[testingSize];
             int i = 0;
             foreach (INeuralDataPair pair in testingSet)
             {
                 INeuralData output = Network.Network.Compute(pair.Input);
-                double small = 0.66;
+                double small = 0.0;
                 for (int r = 0; r < 4; r++)
                 {
                     if ((double)(output[r]) >= small)
@@ -110,10 +121,15 @@ namespace MSI_Etap3.Helper
                 i++;
             }
             int[] answers = DenormaliseAnswers(neuralAnswer);
+            Logger("Neural Network Learning Result" + Environment.NewLine, logDir, timeStamp);
+            Logger(errors[errors.Count - 1] + " %" + Environment.NewLine, logDir, timeStamp);
             Console.WriteLine("Neural Network Results");
+            Logger("Neural Network Testing Result" + Environment.NewLine, logDir, timeStamp);
             double calculateError = CalculateFinalError(answers, testingSet);
             Console.WriteLine("Error: " + calculateError + " %");
+            Logger("Error: " + calculateError + " %" + Environment.NewLine, logDir, timeStamp);
             Console.WriteLine("Time elapsed: {0:hh\\:mm\\:ss}", stopwatch.Elapsed);
+            Logger(String.Format("Time elapsed: {0:hh\\:mm\\:ss}", stopwatch.Elapsed) + Environment.NewLine, logDir, timeStamp);
             Console.WriteLine("FINISH");
 
             if ((errors[errors.Count - 1] * 100).ToString().Length > 4)
@@ -168,7 +184,7 @@ namespace MSI_Etap3.Helper
                 }
                 j++;
             }
-            
+
             Console.WriteLine("test");
             int[] idealAnswers = DenormaliseAnswers(neuralAnswers);
             for (int i = 0; i < answers.Count(); i++)
@@ -196,56 +212,39 @@ namespace MSI_Etap3.Helper
             return adDoubleArray.Select(d => (int)d).ToArray();
         }
 
-        public static INeuralDataSet NormaliseDataSet(double[][] input, double[][] ideal, int multipleOutput)
+        public static INeuralDataSet NormaliseDataSet(double[][] input, double[][] ideal)
         {
             Console.WriteLine("Normalizuje...");
             double[][] norm_input = new double[input.Length][];
             double[][] norm_ideal = new double[input.Length][];
 
-            if (multipleOutput == 0)
+
+            double maxInput = input[0][0], minInput = input[0][0];
+
+            for (int i = 0; i < input.Length; i++)
             {
-                double maxInput = input[0][0], minInput = input[0][0];
-                maxOutput = ideal[0][0];
-                minOutput = ideal[0][0];
-
-                for (int i = 0; i < input.Length; i++)
+                for (int j = 0; j < input[i].Count(); j++)
                 {
-                    for (int j = 0; j < input[i].Count(); j++)
-                    {
-                        if (input[i][j] < minInput)
-                            minInput = input[i][j];
+                    if (input[i][j] < minInput)
+                        minInput = input[i][j];
 
-                        if (input[i][j] > maxInput)
-                            maxInput = input[i][j];
-                    }
-
-                    if (ideal[i][0] < minOutput)
-                        minOutput = ideal[i][0];
-
-                    if (ideal[i][0] > maxOutput)
-                        maxOutput = ideal[i][0];
+                    if (input[i][j] > maxInput)
+                        maxInput = input[i][j];
                 }
-
-
-                for (int i = 0; i < input.Length; i++)
-                {
-                    norm_input[i] = new double[input[i].Count()];
-                    for (int j = 0; j < input[i].Count(); j++)
-                    {
-                        norm_input[i][j] = (input[i][j] - minInput) / (maxInput - minInput);
-                    }
-                    norm_ideal[i] = new double[1];
-                    norm_ideal[i][0] = (ideal[i][0] - minOutput) / (maxOutput - minOutput);
-                }
-                Console.WriteLine("Znormalizowano");
-                Thread.Sleep(500);
             }
-            else
+
+            for (int i = 0; i < input.Length; i++)
             {
-                norm_input = input;
-                norm_ideal = ideal;
+                norm_input[i] = new double[input[i].Count()];
+                for (int j = 0; j < input[i].Count(); j++)
+                {
+                    norm_input[i][j] = (input[i][j] - minInput) / (maxInput - minInput);
+                }
             }
-            INeuralDataSet dataset = CombineTrainingSet(norm_input, norm_ideal);
+            Console.WriteLine("Znormalizowano");
+            Thread.Sleep(500);
+
+            INeuralDataSet dataset = CombineTrainingSet(norm_input, ideal);
             return dataset;
         }
 
@@ -255,7 +254,7 @@ namespace MSI_Etap3.Helper
             BasicNetwork network = new BasicNetwork();
             //------------------------------------------------------------------------------------------
 
-            int szerokosc = inputData.hiddenNeurons;
+            int[] szerokosc = inputData.hiddenNeurons;
             int dlugosc = inputData.hiddenLayers;
             bool bias = inputData.bias;
             IActivationFunction ActivationFunction = inputData.activationFunction;
@@ -267,7 +266,9 @@ namespace MSI_Etap3.Helper
             network.AddLayer(new BasicLayer(ActivationFunction, bias, inputSize));
 
             for (int i = 0; i < dlugosc; i++)
-                network.AddLayer(new BasicLayer(ActivationFunction, bias, szerokosc));
+            {
+                network.AddLayer(new BasicLayer(ActivationFunction, bias, szerokosc[i]));
+            }
 
             network.AddLayer(new BasicLayer(ActivationFunction, false, 4));
 

@@ -19,7 +19,6 @@ namespace MSI_Etap3.Content
         public string Name { get; set; }
         public string FolderName { get; set; }
         public int ClassIndex { get; set; }
-        public int NetworkIndex { get; set; }
         public List<float> Features { get; set; }
 
         /// <summary>
@@ -30,7 +29,6 @@ namespace MSI_Etap3.Content
             this.Name = "unknown";
             this.FolderName = "unknown";
             this.ClassIndex = -1;
-            this.NetworkIndex = -1;
             this.Features = new List<float>();
         }
 
@@ -40,7 +38,7 @@ namespace MSI_Etap3.Content
         /// </summary>
         public int ValidateFace()
         {
-            if (this.Name != "unknown" && this.ClassIndex != -1 && this.NetworkIndex != -1 && this.FolderName != "unknown" && this.Features.Count > 1)
+            if (this.Name != "unknown" && this.ClassIndex != -1 && this.FolderName != "unknown" && this.Features.Count > 1)
                 return 1;
             else
                 return -1;
