@@ -101,6 +101,8 @@ namespace MSI_Etap3.Helper
             /// TERAZ ZBIOR TESTOWY, WYNIKI
             /// I WYKRES ERRORA
             /// 
+
+            string errDir = logDir + "ERRORS\\err_" + timeStamp + ".r";
             Logger(inputData.ToString(), logDir, timeStamp);
 
             double[] neuralAnswer = new double[testingSize];
@@ -141,17 +143,19 @@ namespace MSI_Etap3.Helper
             else
                 inputData.testingError = calculateError.ToString() + " %";
             inputData.timeElapsed = stopwatch.Elapsed.Hours + "h " + stopwatch.Elapsed.Minutes + "min " + stopwatch.Elapsed.Seconds + "sec";
-            CreateErrorFile(errors);
+            CreateErrorFile(errors, errDir);
 
             return Network;
 
         }
 
-        public static void CreateErrorFile(List<double> errors)
+        public static void CreateErrorFile(List<double> errors, string dir)
         {
             string line = "";
+
+            Directory.CreateDirectory(Path.GetDirectoryName(dir));
             // Write the string to a file.
-            System.IO.StreamWriter file = new System.IO.StreamWriter("errors.R");
+            System.IO.StreamWriter file = new System.IO.StreamWriter(dir, true);
 
             NumberFormatInfo nfi = new NumberFormatInfo();
             nfi.NumberDecimalSeparator = ".";

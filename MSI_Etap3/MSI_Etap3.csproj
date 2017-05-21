@@ -87,6 +87,7 @@
     <Compile Include="Helper\ImageLoader.cs" />
     <Compile Include="Helper\InputHelper.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
+    <Compile Include="Helper\TestsHelper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

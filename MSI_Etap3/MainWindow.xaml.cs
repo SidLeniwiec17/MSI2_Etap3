@@ -124,6 +124,12 @@ namespace MSI_Etap3
                 BlakWait.Visibility = Visibility.Collapsed;
                 return;
             }
+            if (testingFaces.Count < 1 || testingFaces == null)
+            {
+                MessageBox.Show("Error ! No data is loaded");
+                BlakWait.Visibility = Visibility.Collapsed;
+                return;
+            }
             if (inputData.ValidateInput(TBLayers.Text, TBNeuronsInLayer.Text, ActivationFunction,
                 TBIteracje.Text, TBWspUczenia.Text, TBWspBezwladnosci.Text) == false)
             {
@@ -208,6 +214,45 @@ namespace MSI_Etap3
                 peopleNumber = peopleCounter;
                 Console.WriteLine("wczytano z binarki " + testingFaces.Count + " danych");
             }
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            BlakWait.Visibility = Visibility.Visible;
+            if (learningFaces.Count < 1 || learningFaces == null)
+            {
+                MessageBox.Show("Error ! No data is loaded");
+                BlakWait.Visibility = Visibility.Collapsed;
+                return;
+            }
+            if (testingFaces.Count < 1 || testingFaces == null)
+            {
+                MessageBox.Show("Error ! No data is loaded");
+                BlakWait.Visibility = Visibility.Collapsed;
+                return;
+            }
+            else
+            {
+                await PerformTests();
+            }
+            BlakWait.Visibility = Visibility.Collapsed;
+        }
+        public async Task PerformTests()
+        {
+            await Task.Run(() =>
+            {
+                Console.WriteLine("Szykuje dane zbioru uczacego");
+                double[][] neuralLearningInput = NetworkHelper.CreateLearningInputDataSet(learningFaces);
+                double[][] neuralLearningOutput = NetworkHelper.CreateLearningOutputDataSet(learningFaces, 4);
+                double[][] neuralTestingInput = NetworkHelper.CreateLearningInputDataSet(testingFaces);
+                double[][] neuralTestingOutput = NetworkHelper.CreateLearningOutputDataSet(testingFaces, 4);
+                INeuralDataSet learningSet, testingSet;
+
+                learningSet = NetworkHelper.NormaliseDataSet(neuralLearningInput, neuralLearningOutput);
+                testingSet = NetworkHelper.NormaliseDataSet(neuralTestingInput, neuralTestingOutput);
+                
+                TestsHelper.RunTests(learningSet, testingSet, learningFaces[0].Features.Count, testingFaces.Count, learningFaces ,learningFaces);
+            });
         }
     }
 }
