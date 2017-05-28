@@ -22,8 +22,7 @@ using Encog.Neural.NeuralData;
 using Encog.Neural.Data.Basic;
 using Encog.Neural.Activation;
 using Encog.Neural.Networks.Training;
-
-
+using MSI_Etap3.ReportHelper;
 
 namespace MSI_Etap3
 {
@@ -250,8 +249,50 @@ namespace MSI_Etap3
 
                 learningSet = NetworkHelper.NormaliseDataSet(neuralLearningInput, neuralLearningOutput);
                 testingSet = NetworkHelper.NormaliseDataSet(neuralTestingInput, neuralTestingOutput);
-                
-                TestsHelper.RunTests(learningSet, testingSet, learningFaces[0].Features.Count, testingFaces.Count, learningFaces ,learningFaces);
+
+                TestsHelper.RunTests(learningSet, testingSet, learningFaces[0].Features.Count, testingFaces.Count, learningFaces, testingFaces);
+            });
+        }
+        private async void ReportButton_Click(object sender, RoutedEventArgs e)
+        {
+            BlakWait.Visibility = Visibility.Visible;
+            inputData = new InputClass();
+            if (learningFaces.Count < 1 || learningFaces == null)
+            {
+                MessageBox.Show("Error ! No data is loaded");
+                BlakWait.Visibility = Visibility.Collapsed;
+                return;
+            }
+            if (testingFaces.Count < 1 || testingFaces == null)
+            {
+                MessageBox.Show("Error ! No data is loaded");
+                BlakWait.Visibility = Visibility.Collapsed;
+                return;
+            }
+            if (inputData.ValidateInput(TBLayers.Text, TBNeuronsInLayer.Text, ActivationFunction,
+                TBIteracje.Text, TBWspUczenia.Text, TBWspBezwladnosci.Text) == false)
+            {
+                BlakWait.Visibility = Visibility.Collapsed;
+                return;
+            }
+            else
+            {
+                await PerformReportDataCreation();
+            }
+            BlakWait.Visibility = Visibility.Collapsed;
+        }
+        public async Task PerformReportDataCreation()
+        {
+            await Task.Run(() =>
+            {
+                Console.WriteLine("Szykuje dane zbioru uczacego");
+
+                List<Tuple<INeuralDataSet, INeuralDataSet>> crossSets = Report.GetCrossValidationData(learningFaces, testingFaces, 5);
+
+                for (int i = 0; i < crossSets.Count; i++)
+                {
+                    Tuple<double, ConfusionMatrix> reportResults = Report.LearnNetwork(crossSets[i].Item1, crossSets[i].Item2, learningFaces[0].Features.Count, inputData, testingFaces.Count);
+                }
             });
         }
     }

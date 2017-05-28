@@ -16,10 +16,11 @@ namespace MSI_Etap3.Helper
 {
     public class TestsHelper
     {
-        public static int[] hiddenLayers_test = { 1, 2, 4 };
+        public static int[] hiddenLayers_test = { 1 };//, 2, 4 };
         public static List<int[]> hiddenNeurons_test;
-        public static int[] iterations = { 5000, 25000 };
-        public static float[] learningFactor = { 0.001f, 0.01f, 0.1f };
+        public static int[] iterations = { 5000 };
+        //public static int[] iterations = { 5000, 25000 };
+        public static float[] learningFactor = { 0.01f };// ,0.001f, 0.1f };
 
         public static void RunTests(INeuralDataSet learningSet, INeuralDataSet testingSet, int inputSize, int testingSize, List<Face> learningFaces, List<Face> testingFaces)
         {
@@ -54,18 +55,18 @@ namespace MSI_Etap3.Helper
         public static List<int[]> initList()
         {
             List<int[]> list = new List<int[]>();
-            list.Add(new int[] { 4 });
-            list.Add(new int[] { 10 });
+            //list.Add(new int[] { 4 });
+            //list.Add(new int[] { 10 });
             list.Add(new int[] { 20 });
-            list.Add(new int[] { 12, 6 });
-            list.Add(new int[] { 12, 12 });
-            list.Add(new int[] { 20, 6 });
-            list.Add(new int[] { 24, 12, 8, 6 });
-            list.Add(new int[] { 12, 12, 12, 12 });
-            list.Add(new int[] { 24, 24, 24, 24 });
+            //list.Add(new int[] { 12, 6 });
+            //list.Add(new int[] { 12, 12 });
+            //list.Add(new int[] { 20, 6 });
+            //list.Add(new int[] { 24, 12, 8, 6 });
+            //list.Add(new int[] { 12, 12, 12, 12 });
+            //list.Add(new int[] { 24, 24, 24, 24 });
             return list;
         }
-        public static async void Learn(INeuralDataSet learningSet, INeuralDataSet testingSet, int inputSize, InputClass inputData, int testingSize, int index)
+        public static void Learn(INeuralDataSet learningSet, INeuralDataSet testingSet, int inputSize, InputClass inputData, int testingSize, int index)
         {
             string logDir = System.IO.Path.GetDirectoryName(Application.ExecutablePath);
             int iteracje = inputData.iterations;

@@ -145,6 +145,7 @@ namespace MSI_Etap3.Helper
             inputData.timeElapsed = stopwatch.Elapsed.Hours + "h " + stopwatch.Elapsed.Minutes + "min " + stopwatch.Elapsed.Seconds + "sec";
             CreateErrorFile(errors, errDir);
 
+           
             return Network;
 
         }
