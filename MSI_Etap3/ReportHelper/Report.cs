@@ -16,6 +16,7 @@ namespace MSI_Etap3.ReportHelper
     {
         public static List<Tuple<INeuralDataSet, INeuralDataSet>> GetCrossValidationData(List<Face> learningFaces, List<Face> testingFaces, int pairs)
         {
+            int testSize = learningFaces.Count;
             Random rnd = new Random();
             List<Tuple<INeuralDataSet, INeuralDataSet>> crossValidation = new List<Tuple<INeuralDataSet, INeuralDataSet>>();
             List<Face> allData = new List<Face>();
@@ -28,10 +29,12 @@ namespace MSI_Etap3.ReportHelper
             List<Face> tmpTestingFaces = new List<Face>();
             for (int i = 0; i < pairs; i++)
             {
+                tmpLearningFaces = new List<Face>();
+                tmpTestingFaces = new List<Face>();
                 RandomizeSet(rnd, allData);
                 for(int j = 0; j < allData.Count; j++)
                 {
-                    if(j<learningFaces.Count)
+                    if(j < testSize)
                     {
                         tmpLearningFaces.Add(allData[j]); 
                     }
@@ -45,7 +48,7 @@ namespace MSI_Etap3.ReportHelper
                 INeuralDataSet learningSet = NetworkHelper.NormaliseDataSet(neuralLearningInput, neuralLearningOutput);
                 double[][] neuralTestingInput = NetworkHelper.CreateLearningInputDataSet(tmpTestingFaces);
                 double[][] neuralTestingOutput = NetworkHelper.CreateLearningOutputDataSet(tmpTestingFaces, 4);
-                INeuralDataSet testingSet = NetworkHelper.NormaliseDataSet(neuralLearningInput, neuralLearningOutput);
+                INeuralDataSet testingSet = NetworkHelper.NormaliseDataSet(neuralTestingInput, neuralTestingOutput);
                 crossValidation.Add(new Tuple<INeuralDataSet, INeuralDataSet>(learningSet,testingSet));
             }
 
@@ -68,7 +71,7 @@ namespace MSI_Etap3.ReportHelper
             int newPosition = rnd.Next(min, max);
             return newPosition;
         }
-        public static Tuple<double, ConfusionMatrix> LearnNetwork(INeuralDataSet learningSet, INeuralDataSet testingSet, int inputSize, InputClass inputData, int testingSize)
+        public static Tuple<double, ConfusionMatrix, double, double> LearnNetwork(INeuralDataSet learningSet, INeuralDataSet testingSet, int inputSize, InputClass inputData, int testingSize)
         {
             int iteracje = inputData.iterations;
             List<double> errors = new List<double>();
@@ -122,8 +125,10 @@ namespace MSI_Etap3.ReportHelper
 
             ConfusionMatrix confusionMatrix = new ConfusionMatrix(4);
             CalculateConfusionMatrix(confusionMatrix, answers, testingSet);
+            double precission = CalculatePrecission(confusionMatrix);
+            double recall = CalculateRecall(confusionMatrix);
 
-            return new Tuple<double, ConfusionMatrix>(calculateError, confusionMatrix);
+            return new Tuple<double, ConfusionMatrix, double, double>(calculateError, confusionMatrix, precission, recall);
         }
         public static void CalculateConfusionMatrix(ConfusionMatrix confusionMatrix, int[] networkAnswers, INeuralDataSet expectedResults)
         {
@@ -139,14 +144,54 @@ namespace MSI_Etap3.ReportHelper
                 }
                 j++;
             }
+            int[] classesCounter = new int[4];
 
             Console.WriteLine("test");
             int[] idealAnswers = NetworkHelper.DenormaliseAnswers(neuralAnswers);
             for (int i = 0; i < networkAnswers.Count(); i++)
             {
-                if (idealAnswers[i] == networkAnswers[i])
-                    properAnswer++;
+                classesCounter[idealAnswers[i]]++;
+                confusionMatrix.Matrix[networkAnswers[i]][idealAnswers[i]].X++; 
             }
+            for(int i = 0; i < confusionMatrix.Classes; i++)
+            {
+                for(int q = 0; q < confusionMatrix.Classes; q++)
+                {
+                    confusionMatrix.Matrix[i][q].Y = classesCounter[q];
+                }
+            }
+        }
+        public static double CalculatePrecission(ConfusionMatrix confusionMatrix)
+        {
+            double precision = 0.0;
+            for(int i = 0; i < confusionMatrix.Classes; i++)
+            {
+                double tmpPrecission = 0.0;
+                for (int j = 0; j < confusionMatrix.Classes; j++)
+                {
+                    tmpPrecission += (double)confusionMatrix.Matrix[j][i].X;
+                }
+                tmpPrecission = (double)confusionMatrix.Matrix[i][i].X / tmpPrecission;
+                precision += tmpPrecission;
+            }
+            precision = precision / (double)confusionMatrix.Classes;
+            return precision;
+        }
+        public static double CalculateRecall(ConfusionMatrix confusionMatrix)
+        {
+            double recall = 0.0;
+            for (int i = 0; i < confusionMatrix.Classes; i++)
+            {
+                double tmpRecall = 0.0;
+                for (int j = 0; j < confusionMatrix.Classes; j++)
+                {
+                    tmpRecall += (double)confusionMatrix.Matrix[i][j].X;
+                }
+                tmpRecall = (double)confusionMatrix.Matrix[i][i].X / tmpRecall;
+                recall += tmpRecall;
+            }
+            recall = recall / (double)confusionMatrix.Classes;
+            return recall;
         }
     }
 }

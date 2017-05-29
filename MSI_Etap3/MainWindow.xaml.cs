@@ -283,6 +283,7 @@ namespace MSI_Etap3
         }
         public async Task PerformReportDataCreation()
         {
+            List<Tuple<double, ConfusionMatrix, double, double>> partialSolutions = new List<Tuple<double, ConfusionMatrix, double, double>>();
             await Task.Run(() =>
             {
                 Console.WriteLine("Szykuje dane zbioru uczacego");
@@ -291,9 +292,11 @@ namespace MSI_Etap3
 
                 for (int i = 0; i < crossSets.Count; i++)
                 {
-                    Tuple<double, ConfusionMatrix> reportResults = Report.LearnNetwork(crossSets[i].Item1, crossSets[i].Item2, learningFaces[0].Features.Count, inputData, testingFaces.Count);
+                    Tuple<double, ConfusionMatrix, double, double> reportResults = Report.LearnNetwork(crossSets[i].Item1, crossSets[i].Item2, learningFaces[0].Features.Count, inputData, testingFaces.Count);
+                    partialSolutions.Add(reportResults);
                 }
             });
+            Console.WriteLine("Results calculated !");
         }
     }
 }
